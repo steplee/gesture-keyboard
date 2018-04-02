@@ -14,9 +14,15 @@ class Node {
     void insert(std::string& w, V* v);
     V* find(std::string& w);
 
+    Node<V>* getChild(char c);
+    char getKey();
+    V* getVal();
+
   private:
     Node<V>* children[26];
     bool terminal;
+
+    char key;
     V* val;
 
 };

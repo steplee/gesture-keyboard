@@ -17,22 +17,24 @@
  * It also will receive messages from the server and forward them structured to the kbd.
  */
 
+using namespace std;
+
 
 typedef websocketpp::server<websocketpp::config::asio> server;
 
-//struct Message { std::string data; };
-typedef std::string Message;
+//struct Message { string data; };
+typedef string Message;
 
-std::mutex pending_mtx;
-std::condition_variable pending_cv;
-std::vector<Message> pending;
+mutex pending_mtx;
+condition_variable pending_cv;
+vector<Message> pending;
 
 void on_message(websocketpp::connection_hdl hdl, server::message_ptr msg) {
-  std::unique_lock<std::mutex> lock(pending_mtx);
+  unique_lock<mutex> lock(pending_mtx);
 
-  //std::cout << msg->get_payload() << std::endl;
+  //cout << msg->get_payload() << endl;
 
-  std::string msg_str = msg->get_payload();
+  string msg_str = msg->get_payload();
   pending.push_back(msg_str);
 
   lock.unlock();
@@ -54,26 +56,26 @@ void ws_server_thread_target() {
 
 int main() {
 
-  std::cout << " -- Creating Trie" << std::endl;
+  cout << " -- Creating Trie" << endl;
   Trie<int> t;
   int def = 0;
   t.create_with_default({"hello", "apple", "world", "cat", "dog"}, &def);
 
   Keyboard kbd;
 
-  std::cout << " -- Launching ws thread" << std::endl;
-  std::thread ws_thread(ws_server_thread_target);
+  cout << " -- Launching ws thread" << endl;
+  thread ws_thread(ws_server_thread_target);
 
-  std::cout<<" -- Main thread looping.\n";
+  cout<<" -- Main thread looping.\n";
   while(true) {
 
-    std::unique_lock<std::mutex> lock(pending_mtx);
+    unique_lock<mutex> lock(pending_mtx);
     pending_cv.wait(lock, []{return not pending.empty();});
 
     Message msg(pending.back());
     pending.pop_back();
 
-    std::cout << " -- Read " << msg << std::endl;
+    cout << " -- Read " << msg << endl;
   }
 
   return 0;

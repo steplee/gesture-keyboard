@@ -1,11 +1,20 @@
 #pragma once
+#include <utility>
 #include "trie.h"
+#include "search.h"
+
 
 
 class Keyboard {
   private:
-    Trie<float> trie;
+    typedef std::pair<float, float> point;
+    typedef std::tuple<float, float> timepoint;
 
+    Trie<float> trie;
+    Searcher* searcher;
+
+
+    point key_pos[26];
 
   public:
     void recv_reset();
