@@ -11,7 +11,7 @@ SRCS := src/main.cc src/trie.cc src/keyboard.cc src/search.cc
 	g++ -c $< $(FLAGS) $(INCL) -o $@
 
 app: main.o keyboard.o trie.o search.o
-	g++ $(SRCS) -o app $(LIBS) $(INCL) $(FLAGS)
+	g++ *.o -o app $(LIBS) $(INCL) $(FLAGS)
 
 
 clean:
