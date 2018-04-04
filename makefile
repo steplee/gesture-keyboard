@@ -17,6 +17,5 @@ main.o: src/main.cc
 all: main.o keyboard.o trie.o search.o
 	g++ $^ -o app $(LIBS) $(INCL) $(FLAGS)
 
-
 clean:
 	rm -rf *.o app
