@@ -54,9 +54,9 @@ function init() {
         y = e.clientY,
         t = Date.now();
 
-    if (Date.now() - lastTime > 33) {
+    if (Date.now() - lastTime > 333) {
       if (lastPos == undefined) {
-        sock.send("begin")
+        sock.send(JSON.stringify({type:"begin"}))
       } else {
         // Draw
         ctx.beginPath();
@@ -66,10 +66,12 @@ function init() {
       }
 
       // Send
+      let xx = x/canvas.width,
+          yy = y/canvas.height;
       var jobj = {
         type: "move",
-        time: t-firstTime,
-        x,y
+        time: (t-firstTime)/1000.0,
+        x:xx,y:yy
       }
       sock.send(JSON.stringify(jobj));
 
@@ -83,7 +85,8 @@ function init() {
     render_keyboard();
     lastPos = undefined;
     lastTime = firstTime;
-    sock.send("end")
+    sock.send(JSON.stringify({type:"end"}))
+    sock.send(JSON.stringify({type:"begin"}))
   }
 
   function render_keyboard() {
@@ -93,5 +96,10 @@ function init() {
       var yx = keyboard_layout.keys[ch];
       ctx.fillText(ch, yx[1]*_w, yx[0]*_h);
     }
+  }
+
+
+  window.onbeforeunload = function (e) {
+    sock.close();
   }
 }

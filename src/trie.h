@@ -38,8 +38,9 @@ class Trie {
 
     static Trie create_from_file(std::string file_name, V* val);
 
-
     V* find(std::string word);
+
+    Node<V>* get_first_level(char nc) const;
 
   private:
     Node<V>* root;

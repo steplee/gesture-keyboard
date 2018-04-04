@@ -2,6 +2,7 @@
 #include <set>
 #include <algorithm>
 #include <map>
+#include <memory>
 
 // forward decls
 class Keyboard;
@@ -27,14 +28,15 @@ constexpr float EXTEND_THRESH = .3;
  */
 struct Thread {
   using T = float;
+  using ptr = std::shared_ptr<Thread>;
 
-  Thread(const Thread* p, Node<T>* n, char ch);
+  Thread(Thread::ptr p, Node<T>* n, char ch, int time);
+  ~Thread();
 
-  const Thread* parent;
+  Thread::ptr parent;
   Node<T>* place;
 
-  // TODO use smart pointers
-  Thread* children[26];
+  Thread::ptr children[26];
   float potential;
 
   // Number of children that are alive.
@@ -43,12 +45,16 @@ struct Thread {
   int time_created;
   bool just_created; // TODO implement
 
+  // TODO just for debugging.
+  std::string acc;
+
   char last_char;
 };
 
 /*
  * Quite a bit of freedom here, I'll have to try several methods.
- * I will start with pairwise potential method
+ * I will start with pairwise potential method, before worrying about 
+ * seperating interface/impl
  *
  * Maintains a bag of threads (ordering is up to implementation) and
  * facilitates scoring
@@ -64,28 +70,27 @@ class Searcher {
     const Keyboard* kbd;
 
     //void extend(const Thread& t, const char next_char);
-    bool maybe_extend(const Thread& t, char nc);
+    bool maybe_extend(const Thread::ptr t, char nc);
 
     // My plan for the algo for these is to loop over each, each action
     // When they are old, move living threads to `dead_threads`.
     // Note these are completely unordered
     //
     // Each query, we check both living and dead_threads. Remove if age expired.
-    std::vector<Thread> threads;
-    std::vector<Thread> dead_threads;
+    std::vector<Thread::ptr> threads;
+    std::vector<Thread::ptr> dead_threads;
 
-
-    // swap+pop
-    void fast_remove(std::vector<Thread>& t, int i);
 
   public:
     Searcher(Trie<T>* trie, Keyboard* kbd);
 
     // Main action function, called by Keyboard
-    // It will move any dead threads to dead_threads
+    // It will move any dead threads to dead_threads (die)
     void observe_move(int time);
 
     // Evaluate energy, sort results.
-    // Any old threads will be completely removed
+    // Any old threads will be completely removed (delete)
     void query(int time);
+
+    void reset();
 };

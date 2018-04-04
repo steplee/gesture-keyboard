@@ -3,6 +3,7 @@
 #include <cstring>
 #include <algorithm>
 #include <cctype>
+#include <iostream>
 
 using namespace std;
 
@@ -26,6 +27,7 @@ template<class V>
 char Node<V>::getKey() {
   return key;
 }
+
 
 template<class V>
 void Node<V>::insert(string &w, V* v) {
@@ -76,6 +78,13 @@ Trie<V>::Trie() {}
 template<class V>
 V* Trie<V>::find(string word) {
   return root->find(word);
+}
+
+template<class V>
+Node<V>* Trie<V>::get_first_level(char nc) const {
+  assert( root );
+  assert(root->getChild(nc));
+  return root->getChild(nc);
 }
 
 

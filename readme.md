@@ -9,13 +9,14 @@ Gesture keyboard like Swype, GBoard, etc.
 
 
 ## Immediate TODO
- 1. Switch `Thread` to use smart pointer children.
- 2. Implement deletion & dying of threads.
- 3. 
+ 1. stdio is corrupted, can't debug.
+ 2. distance, scoring, or extending threads is messed up, thousands of matches are found per move.
 
 ## Working notes
 
 Trie\<V\> is a datastructure for char -> V\*, but I am not currently using V;
+
+Besides a trie, a hashset would serve the same purpose since I'm iterating over all 26 chars anyway. A rolling hash would be efficient.
 
 Threads (concurrency) are used only in main.cc, all other uses of the word `Thread` refer to the search system.
 

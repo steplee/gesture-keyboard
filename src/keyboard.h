@@ -12,7 +12,6 @@ class Keyboard {
     // t y x
     typedef std::pair<float, point> timepoint;
 
-    Trie<float> trie;
     Searcher* searcher;
 
     std::vector<timepoint> path;
@@ -26,13 +25,21 @@ class Keyboard {
     void recv_reset();
     void recv_move(float y, float x, float time);
 
-    // Return the compatibility of a path connecting `from` and `to` and
-    // the path-index, in between the times given.
+    // TODO getter
+    Trie<float> trie;
+
+    float key_dist(char k1, char k2) const;
+
+    // Return the compatibility and time-index of a path connecting `from` and `to`,
+    // in between the times given.
     // NOTE: what this does right now is compare the distance from `from` at `min_time`, to `to`
     // at __any possible time__, returning a function of the min distance.
     // The distance is pushed through `1-log((10x^4))`, to convert it to a score (higher is better)
     // :max_time may be -1, in which case it is taken to be T
+    // TODO save results, dynamic programming style
+    // TODO compare path length with the geodesic connecting them
     std::pair<float, int> score_pairwise_move(int min_time, int max_time, char from, char to) const ;
+    float score_start(char ch) const;
     float dist_to_score(float dist) const ;
 
     Keyboard();

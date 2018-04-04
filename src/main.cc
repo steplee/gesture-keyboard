@@ -8,8 +8,9 @@
 #include "websocketpp/config/asio_no_tls.hpp"
 #include "websocketpp/server.hpp"
 
+#include <nlohmann/json.hpp>
 
-#include "trie.h"
+
 #include "keyboard.h"
 
 /*
@@ -18,6 +19,7 @@
  */
 
 using namespace std;
+using namespace nlohmann; // json
 
 
 typedef websocketpp::server<websocketpp::config::asio> server;
@@ -46,6 +48,7 @@ void ws_server_thread_target() {
   server print_server;
 
   print_server.set_message_handler(&on_message);
+  print_server.set_reuse_addr(true);
 
   print_server.init_asio();
   print_server.listen(9002);
@@ -56,10 +59,9 @@ void ws_server_thread_target() {
 
 int main() {
 
-  cout << " -- Creating Trie" << endl;
-  Trie<int> t;
-  int def = 0;
-  t.create_with_default({"hello", "apple", "world", "cat", "dog"}, &def);
+  std::ios_base::sync_with_stdio(false);
+  std::cin.tie(nullptr);
+  std::cerr.tie(nullptr);
 
   Keyboard kbd;
 
@@ -76,6 +78,17 @@ int main() {
     pending.pop_back();
 
     cout << " -- Read " << msg << endl;
+
+    // Parse received message and act
+    json jobj = json::parse(msg);
+
+    if (jobj["type"] == "move") {
+      kbd.recv_move(jobj["y"], jobj["x"], jobj["time"]);
+
+    } else if (jobj["type"] == "end") {
+      kbd.recv_reset();
+    }
+
   }
 
   return 0;
