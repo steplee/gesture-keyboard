@@ -5,6 +5,7 @@ Gesture keyboard like Swype, GBoard, etc.
  - /frontend has a simple js canvas display
  - /layouts defines keyboard layouts
  - /external has dependencies. Use `./download_deps.sh` to get them.
+ - /prototype will test algorithms in python before coding up in cpp.
 
 
 
