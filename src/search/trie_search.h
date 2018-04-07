@@ -2,7 +2,11 @@
 #include <set>
 #include <algorithm>
 #include <map>
+#include <unordered_map>
 #include <memory>
+
+#include "search/search.h"
+
 
 // forward decls
 class Keyboard;
@@ -50,23 +54,13 @@ struct Thread {
   char last_char;
 };
 
-/*
- * Quite a bit of freedom here, I'll have to try several methods.
- * I will start with pairwise potential method, before worrying about 
- * seperating interface/impl
- *
- * Maintains a bag of threads (ordering is up to implementation) and
- * facilitates scoring
- */
-
-class Searcher {
+class TrieSearcher : public Searcher {
   public:
     using T = float;
 
   private:
     //std::set<Thread> threads;
-    const Trie<T>* trie;
-    const Keyboard* kbd;
+    Trie<T>* trie;
 
     //void extend(const Thread& t, const char next_char);
     bool maybe_extend(const Thread::ptr t, char nc);
@@ -81,15 +75,15 @@ class Searcher {
 
 
   public:
-    Searcher(Trie<T>* trie, Keyboard* kbd);
+    TrieSearcher(Keyboard* kbd);
 
     // Main action function, called by Keyboard
     // It will move any dead threads to dead_threads (die)
-    void observe_move(int time);
+    virtual void observe_move(int time);
 
     // Evaluate energy, sort results.
     // Any old threads will be completely removed (delete)
-    void query(int time);
+    virtual void query(int time);
 
-    void reset();
+    virtual void reset();
 };

@@ -3,6 +3,7 @@
 #include "trie.h"
 #include "search.h"
 
+class Searcher;
 
 
 class Keyboard {
@@ -24,9 +25,6 @@ class Keyboard {
   public:
     void recv_reset();
     void recv_move(float y, float x, float time);
-
-    // TODO getter
-    Trie<float> trie;
 
     float key_dist(char k1, char k2) const;
 

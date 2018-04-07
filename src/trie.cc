@@ -101,7 +101,7 @@ void Trie<V>::create_with_default(vector<string> words, V* def) {
 }
 
 template<class V>
-Trie<V> Trie<V>::create_from_file(string file_name, V* def) {
+Trie<V> *Trie<V>::create_from_file(string file_name, V* def) {
   ifstream file(file_name);
   cout << " --- Creating trie from file " << file_name << endl;
 
@@ -116,8 +116,8 @@ Trie<V> Trie<V>::create_from_file(string file_name, V* def) {
       words.push_back(word);
   }
 
-  Trie<V> trie;
-  trie.create_with_default(words, def);
+  Trie<V> *trie = new Trie<V>();
+  trie->create_with_default(words, def);
 
   cout << " --- Done, with " << words.size() << " words" << endl;
   return trie;

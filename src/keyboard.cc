@@ -1,6 +1,9 @@
-
 #include "keyboard.h"
 #include <nlohmann/json.hpp>
+
+
+#include "search/trie_search.h"
+
 
 using namespace std;
 using namespace nlohmann;
@@ -21,22 +24,7 @@ Keyboard::Keyboard() {
   // ---------------------------------
 
 
-  // ---------------------------------
-  // create Trie
-  float f = 1.0;
-  //trie = Trie<float>::create_from_file("/usr/share/dict/cracklib-small", &f);
-  trie = Trie<float>::create_from_file("./words", &f);
-
-  // test
-  cout << " -- Trie test...\n";
-  cout << "\ttrie find hello -> " << trie.find("hello") << endl;
-  cout << "\ttrie find test -> " << trie.find("test") << endl;
-  cout << "\ttrie find apple -> " << trie.find("apple") << endl;
-  cout << "\ttrie find zsdjslfje -> " << trie.find("lshflkshdf") << endl;
-  cout << endl;
-  // ---------------------------------
-
-  searcher = new Searcher(&trie, this);
+  searcher = new TrieSearcher(this);
 }
 
 static void load_word_file(string& dst, string file_name) {
@@ -66,9 +54,10 @@ float Keyboard::dist_to_score(const float dist) const {
   //float s = 1-log(2.71828 * dist*dist);
   float s;
   if (dist == 0)
-    s = 1.0;
+    s = 1.00001;
   else
     s = 1. - log(2.71828 * dist * 2.0);
+
 
   //if (s > 0)
     //cout << dist << " " << s << endl;
@@ -99,6 +88,8 @@ std::pair<float,int> Keyboard::score_pairwise_move(int min_time, int max_time, c
     }
   }
 
-  float s = dist_to_score(best); 
-  return {s, argbest};
+  if (best > 0) {
+    float s = dist_to_score(best); 
+    return {s, argbest};
+  } else return {0,argbest};
 }

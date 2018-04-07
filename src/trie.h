@@ -36,7 +36,7 @@ class Trie {
     void create_with_default(std::vector<std::string> words, V* def);
     void create_with_lists(std::vector<std::string> words, std::vector<V*> vals);
 
-    static Trie create_from_file(std::string file_name, V* val);
+    static Trie *create_from_file(std::string file_name, V* val);
 
     V* find(std::string word);
 

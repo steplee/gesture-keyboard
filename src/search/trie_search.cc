@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "search.h"
+#include "search/trie_search.h"
 #include "trie.h"
 #include "keyboard.h"
 
@@ -50,10 +50,24 @@ Thread::~Thread() {
 // ---------- SEARCHER ------------------
 
 
-Searcher::Searcher(Trie<T>* trie_, Keyboard* kbd_) :
-  trie(trie_),
-  kbd(kbd_)
-{}
+TrieSearcher::TrieSearcher(Keyboard* kbd_) :
+  Searcher(kbd_)
+{
+  // ---------------------------------
+  // create Trie
+  float f = 1.0;
+  //trie = Trie<float>::create_from_file("/usr/share/dict/cracklib-small", &f);
+  trie = Trie<float>::create_from_file("./words", &f);
+
+  // test
+  cout << " -- Trie test...\n";
+  cout << "\ttrie find hello -> " << trie->find("hello") << endl;
+  cout << "\ttrie find test -> " << trie->find("test") << endl;
+  cout << "\ttrie find apple -> " << trie->find("apple") << endl;
+  cout << "\ttrie find zsdjslfje -> " << trie->find("lshflkshdf") << endl;
+  cout << endl;
+  // ---------------------------------
+}
 
 template <class C>
 inline void fast_remove(C& t, int i) {
@@ -61,7 +75,7 @@ inline void fast_remove(C& t, int i) {
   t.pop_back();
 }
 
-void Searcher::observe_move(int time) {
+void TrieSearcher::observe_move(int time) {
   // first movement
   if (threads.size() == 0) {
     cout << " Begin. " << endl;
@@ -76,9 +90,10 @@ void Searcher::observe_move(int time) {
     // consider nearest __4__ keys
     for (int i=0; i<4; i++) {
       //cout << " next includes " << (int)cands[i].second << endl;
-      Node<T> *next_node = kbd->trie.get_first_level(cands[i].second);
+      Node<T> *next_node = trie->get_first_level(cands[i].second);
 
-      threads.push_back( make_shared<Thread>(nullptr, next_node, cands[i].second, time) );
+      if (next_node)
+        threads.push_back( make_shared<Thread>(nullptr, next_node, cands[i].second, time) );
     }
 
   }
@@ -104,7 +119,7 @@ void Searcher::observe_move(int time) {
   }
 }
 
-void Searcher::query(int time) {
+void TrieSearcher::query(int time) {
   // Evaluate score, higher is better
 
   // Build result array
@@ -143,7 +158,7 @@ void Searcher::query(int time) {
 }
 
 
-bool Searcher::maybe_extend(const Thread::ptr t, char nc) {
+bool TrieSearcher::maybe_extend(const Thread::ptr t, char nc) {
   pair<float,int> ts;
   float score;
   int time;
@@ -176,7 +191,7 @@ bool Searcher::maybe_extend(const Thread::ptr t, char nc) {
  * If I remove all references, shared_ptrs should be cleaned up.
  * TODO test with a global counter and call ->reset()
  */
-void Searcher::reset() {
+void TrieSearcher::reset() {
   for (auto& t : threads) {
     t->parent.reset();
     for (auto &tt : t->children)

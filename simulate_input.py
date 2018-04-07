@@ -24,7 +24,7 @@ def on_close(ws):
 def on_open(ws):
     for i,m in enumerate(msgs):
         ws.send(m)
-        time.sleep(.2)
+        time.sleep(.4)
 
     ws.close()
 
