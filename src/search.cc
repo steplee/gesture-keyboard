@@ -158,8 +158,8 @@ bool Searcher::maybe_extend(const Thread::ptr t, char nc) {
 
     if (next_node != nullptr) {
       //printf(" - extend %c %c (%f) [%d]\n", (char)(t->last_char+'a'),(char)(nc+'a'), score, threads.size());
-      //printf(" - extend %s %c (%f) [%d]\n", t->acc.c_str(),(char)(nc+'a'), score, threads.size());
-      cout << " - extend " << t->acc << (char)(nc+'a') << " " << score << endl;
+      printf(" - extend %s %c (%f) [%d]\n", t->acc.c_str(),(char)(nc+'a'), score, threads.size());
+      //cout << " - extend " << t->acc << (char)(nc+'a') << " " << score << endl;
       auto nt = make_shared<Thread>(t, next_node, nc, time);
       threads.push_back( nt );
       //cout << " extended " << nt->acc << endl;

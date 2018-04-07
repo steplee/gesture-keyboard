@@ -32,6 +32,8 @@ var keyboard_layout =  {
 }
 }
 
+var logged = [];
+
 function init() {
   console.log(" -- Frontend -- ");
 
@@ -57,6 +59,7 @@ function init() {
     if (Date.now() - lastTime > 333) {
       if (lastPos == undefined) {
         sock.send(JSON.stringify({type:"begin"}))
+        logged.push(JSON.stringify({type:"begin"}))
       } else {
         // Draw
         ctx.beginPath();
@@ -74,6 +77,7 @@ function init() {
         x:xx,y:yy
       }
       sock.send(JSON.stringify(jobj));
+      logged.push(JSON.stringify(jobj))
 
       lastPos = [x,y];
       lastTime = t;
@@ -87,6 +91,9 @@ function init() {
     lastTime = firstTime;
     sock.send(JSON.stringify({type:"end"}))
     sock.send(JSON.stringify({type:"begin"}))
+    logged.push(JSON.stringify({type:"end"}))
+    logged.push(JSON.stringify({type:"begin"}))
+    console.log(logged)
   }
 
   function render_keyboard() {

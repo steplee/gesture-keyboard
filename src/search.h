@@ -23,7 +23,6 @@ constexpr float EXTEND_THRESH = .3;
 
 /*
  * Enapsulates a position the trie and its score
- * Threads will have children, but pointers only go up.
  * Each chain is an auxiliary structure on-top of the trie (i.e. their may be loops, etc.)
  */
 struct Thread {
