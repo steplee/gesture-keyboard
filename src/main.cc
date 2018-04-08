@@ -60,24 +60,29 @@ void ws_server_thread_target() {
 int main() {
 
   std::ios_base::sync_with_stdio(false);
-  std::cin.tie(nullptr);
-  std::cerr.tie(nullptr);
+  std::cout.tie(nullptr);
+  //std::cin.tie(nullptr);
+  //std::cerr.tie(nullptr);
 
   Keyboard kbd;
 
-  cout << " -- Launching ws thread" << endl;
+  //cout << " -- Launching ws thread" << endl;
   thread ws_thread(ws_server_thread_target);
 
-  cout<<" -- Main thread looping.\n";
+  //cout<<" -- Main thread looping.\n";
   while(true) {
 
     unique_lock<mutex> lock(pending_mtx);
-    pending_cv.wait(lock, []{return not pending.empty();});
+
+    // only wait if we have no work to do.
+    if (pending.empty()) {
+      pending_cv.wait(lock, []{return not pending.empty();});
+    }
 
     Message msg(pending.back());
     pending.pop_back();
 
-    cout << " -- Read " << msg << endl;
+    //cout << " -- Read " << msg << endl;
 
     // Parse received message and act
     json jobj = json::parse(msg);

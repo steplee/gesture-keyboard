@@ -21,13 +21,15 @@ Thread::Thread(Thread::ptr p, Node<T>* n, char ch, int time) :
   just_created(true),
   alive_children(0)
 {
-  if (p != nullptr)
-    potential = p->potential,
-    acc = p->acc + last_char;
-  else
-    potential = 1.0,
-    acc = "_"+last_char;
   memset(children, 0, sizeof(Thread::ptr) * 26);
+
+  if (p.get() != nullptr) {
+    potential = p->potential;
+    acc = p->acc + (char)(last_char+'a');
+  } else {
+    potential = 1.0;
+    acc = std::string("_") + ((char)(last_char+'a'));
+  }
 }
 
 // Utility to unwind a path to a string TODO pass by ref
@@ -60,20 +62,23 @@ TrieSearcher::TrieSearcher(Keyboard* kbd_) :
   trie = Trie<float>::create_from_file("./words", &f);
 
   // test
+  /*
   cout << " -- Trie test...\n";
   cout << "\ttrie find hello -> " << trie->find("hello") << endl;
   cout << "\ttrie find test -> " << trie->find("test") << endl;
   cout << "\ttrie find apple -> " << trie->find("apple") << endl;
   cout << "\ttrie find zsdjslfje -> " << trie->find("lshflkshdf") << endl;
-  cout << endl;
+  cout << endl; */
   // ---------------------------------
 }
 
+/*
 template <class C>
 inline void fast_remove(C& t, int i) {
   iter_swap(t.begin()+i, t.begin()+t.size()-1);
   t.pop_back();
 }
+*/
 
 void TrieSearcher::observe_move(int time) {
   // first movement
@@ -92,8 +97,12 @@ void TrieSearcher::observe_move(int time) {
       //cout << " next includes " << (int)cands[i].second << endl;
       Node<T> *next_node = trie->get_first_level(cands[i].second);
 
-      if (next_node)
-        threads.push_back( make_shared<Thread>(nullptr, next_node, cands[i].second, time) );
+      if (next_node) { 
+        auto t = make_shared<Thread>(nullptr, next_node, cands[i].second, time);
+        //printf("Starting with: %s\n", t->acc);
+        cout << " - Starting with " << t->acc << endl;
+        threads.push_back(t);
+      }
     }
 
   }
@@ -161,8 +170,8 @@ void TrieSearcher::query(int time) {
 bool TrieSearcher::maybe_extend(const Thread::ptr t, char nc) {
   pair<float,int> ts;
   float score;
-  int time;
-  tie(score, time) = kbd->score_pairwise_move(t->time_created, -1, t->last_char, nc);
+  int time_of_creation;
+  tie(score, time_of_creation) = kbd->score_pairwise_move(t->time_created, -1, t->last_char, nc);
 
   // TODO: if nc is last_char, check that we did a loop-like movement
 
@@ -172,12 +181,12 @@ bool TrieSearcher::maybe_extend(const Thread::ptr t, char nc) {
     Node<T> *next_node = t->place->getChild(nc);
 
     if (next_node != nullptr) {
-      //printf(" - extend %c %c (%f) [%d]\n", (char)(t->last_char+'a'),(char)(nc+'a'), score, threads.size());
-      printf(" - extend %s %c (%f) [%d]\n", t->acc.c_str(),(char)(nc+'a'), score, threads.size());
-      //cout << " - extend " << t->acc << (char)(nc+'a') << " " << score << endl;
-      auto nt = make_shared<Thread>(t, next_node, nc, time);
+      //printf(" - extend %s %c (%f) [%d]\n", t->acc.c_str(),(char)(nc+'a'), score, threads.size());
+      //cout << " - extend " << t->acc << " " << (char)(nc+'a') << " " << score << " " << threads.size() << endl;
+      fflush(stdout);
+
+      auto nt = make_shared<Thread>(t, next_node, nc, time_of_creation);
       threads.push_back( nt );
-      //cout << " extended " << nt->acc << endl;
     }
   }
 
@@ -186,7 +195,6 @@ bool TrieSearcher::maybe_extend(const Thread::ptr t, char nc) {
 
 
 /*
- * This /should/ work  :|
  *
  * If I remove all references, shared_ptrs should be cleaned up.
  * TODO test with a global counter and call ->reset()

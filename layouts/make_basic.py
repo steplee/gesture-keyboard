@@ -1,3 +1,5 @@
+' Note: the format is [y,x] '
+
 rows = [
         list('qwertyuiop'),
         list('asdfghjkl'),

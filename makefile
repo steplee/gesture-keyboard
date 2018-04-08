@@ -7,6 +7,7 @@ INCL := -I ./external/websocketpp/ -I ./external/json/single_include -I ./src
 #MAIN_SRCS := src/main.cc 
 #SRCS := src/main.cc src/trie.cc src/keyboard.cc src/search.cc
 
+
 %.o: src/%.cc src/%.h
 	g++ -c $< $(FLAGS) $(INCL) -o $@
 
@@ -17,7 +18,7 @@ INCL := -I ./external/websocketpp/ -I ./external/json/single_include -I ./src
 main.o: src/main.cc
 	g++ -c $< $(FLAGS) $(INCL) -o $@
 
-all: main.o keyboard.o trie.o trie_search.o hash_pairwise_search.o
+all: main.o keyboard.o trie.o  hash_pairwise_search.o
 	g++ $^ -o app $(LIBS) $(INCL) $(FLAGS)
 
 clean:

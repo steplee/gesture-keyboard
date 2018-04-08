@@ -1,18 +1,15 @@
 #pragma once
 #include <utility>
 #include "trie.h"
-#include "search.h"
+#include "search/search.h"
 
 class Searcher;
 
 
 class Keyboard {
-  private:
-    // y x
-    typedef std::pair<float, float> point;
-    // t y x
-    typedef std::pair<float, point> timepoint;
+  public:
 
+  private:
     Searcher* searcher;
 
     std::vector<timepoint> path;
@@ -39,6 +36,12 @@ class Keyboard {
     std::pair<float, int> score_pairwise_move(int min_time, int max_time, char from, char to) const ;
     float score_start(char ch) const;
     float dist_to_score(float dist) const ;
+
+
+    // how far is x,y to character c?
+    float dist_to_key(point& p, char c);
+
+    timepoint getPath(int time);
 
     Keyboard();
 };

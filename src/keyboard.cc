@@ -2,7 +2,8 @@
 #include <nlohmann/json.hpp>
 
 
-#include "search/trie_search.h"
+//#include "search/trie_search.h"
+#include "search/hash_pairwise_search.h"
 
 
 using namespace std;
@@ -24,18 +25,16 @@ Keyboard::Keyboard() {
   // ---------------------------------
 
 
-  searcher = new TrieSearcher(this);
-}
-
-static void load_word_file(string& dst, string file_name) {
-
+  searcher = new HashPairwiseSearcher(this);
+  //searcher = new TrieSearcher(this);
 }
 
 void Keyboard::recv_move(float y, float x, float time) {
+  point p{y,x};
+  path.push_back({time,p});
   cout << "move " << y << " " << x << " at " << time << " path len " << path.size() << endl;
-  path.push_back({time,{y,x}});
 
-  searcher->observe_move(time);
+  searcher->observe_move(path.size()-1);
 }
 
 void Keyboard::recv_reset() {
@@ -44,7 +43,6 @@ void Keyboard::recv_reset() {
 
 float Keyboard::distance(const point& a, const point& b) const {
   float d = sqrt( (a.first-b.first)*(a.first-b.first) + (a.second-b.second)*(a.second-b.second) );
-  //printf("dist %f %f || %f %f   --->  %f\n", a.first,a.second, b.first,b.second, d);
   return d;
 }
 float Keyboard::key_dist(char k1, char k2) const {
@@ -59,8 +57,6 @@ float Keyboard::dist_to_score(const float dist) const {
     s = 1. - log(2.71828 * dist * 2.0);
 
 
-  //if (s > 0)
-    //cout << dist << " " << s << endl;
   return max(0.f,min(1.f,s));
 }
 
@@ -77,19 +73,30 @@ std::pair<float,int> Keyboard::score_pairwise_move(int min_time, int max_time, c
   if (max_time < 0) max_time = path.size();
 
   int argbest = min_time;
-  float best = -1.0;
+  float bestdist = 99.0;
 
-  //for (int t=min_time+1; t<max_time; t++) {
-  for (int t=min_time; t<max_time; t++) {
+  /*
+  bestdist = distance(path[min_time].second, path[max_time].second);
+  return {max(0.f, .6f-bestdist),0};
+  */
+
+  for (int t=min_time+1; t<max_time; t++) {
     float d = distance(a, path[t].second);
-    if (d > best) {
-      best = d;
+    if (d < bestdist) {
+      bestdist = d;
       argbest = t;
     }
   }
 
-  if (best > 0) {
-    float s = dist_to_score(best); 
-    return {s, argbest};
-  } else return {0,argbest};
+
+  float s = dist_to_score(bestdist); 
+  return {s, argbest};
+}
+
+float Keyboard::dist_to_key(point& p, char ch) {
+  return distance(p, key_pos[ch]);
+}
+
+timepoint Keyboard::getPath(int time) {
+  return path[time];
 }

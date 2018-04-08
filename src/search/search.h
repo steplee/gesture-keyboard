@@ -4,6 +4,29 @@
 #include <map>
 #include <unordered_map>
 #include <memory>
+#include <utility>
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+//                      UTILITY
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+// y x
+typedef std::pair<float, float> point;
+// t y x
+typedef std::pair<float, point> timepoint;
+
+template <class C>
+inline void fast_remove(C& t, int i) {
+  iter_swap(t.begin()+i, t.begin()+t.size()-1);
+  t.pop_back();
+}
+
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+
 
 // forward decls
 class Keyboard;
